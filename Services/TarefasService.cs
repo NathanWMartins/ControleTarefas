@@ -1,5 +1,6 @@
 using TarefasApi.Data;
 using TarefasApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace TarefasApi.Services
 {
@@ -12,41 +13,46 @@ namespace TarefasApi.Services
             _context = context;
         }
 
-        public List<Tarefa> GetTarefas()
+        public async Task<List<Tarefa>> GetTarefas()
         {
-            return _context.Tarefas.ToList();
+            return await _context.Tarefas.ToListAsync();
         }
 
-        public Tarefa CriarTarefa(Tarefa tarefa)
+        public async Task<Tarefa> CriarTarefa(Tarefa tarefa)
         {
             _context.Tarefas.Add(tarefa);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return tarefa;
         }
 
-        public Tarefa? GetTarefaPorId(int id)
+        public async Task<Tarefa?> GetTarefaPorId(int id)
         {
-            return _context.Tarefas.FirstOrDefault(t => t.Id == id);
+            return await _context.Tarefas.FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public Tarefa? ConcluirTarefa(int id)
+        public async Task<Tarefa?> ConcluirTarefa(int id)
         {
-            var tarefa = _context.Tarefas.FirstOrDefault(t => t.Id == id);
+            var tarefa = await _context.Tarefas.FirstOrDefaultAsync(t => t.Id == id);
+
             if (tarefa != null)
             {
                 tarefa.Concluida = true;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
+
             return tarefa;
         }
 
-        public bool ExcluirTarefa(int id)
+        public async Task<bool> ExcluirTarefa(int id)
         {
-            var tarefaExistente = _context.Tarefas.FirstOrDefault(t => t.Id == id);
-            if (tarefaExistente == null) return false;
+            var tarefa = await _context.Tarefas.FirstOrDefaultAsync(t => t.Id == id);
 
-            _context.Tarefas.Remove(tarefaExistente);
-            _context.SaveChanges();
+            if (tarefa == null)
+                return false;
+
+            _context.Tarefas.Remove(tarefa);
+            await _context.SaveChangesAsync();
+
             return true;
         }
     }

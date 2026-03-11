@@ -17,23 +17,23 @@ namespace TarefasApi.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            return Ok(_service.GetTarefas());
+            var tarefas = await _service.GetTarefas();
+            return Ok(tarefas);
         }
 
         [HttpPost]
-        public IActionResult Criar(Tarefa tarefa)
+        public async Task<IActionResult> Criar(Tarefa tarefa)
         {
-            if(!ModelState.IsValid) return BadRequest(ModelState);
-            var novaTarefa = _service.CriarTarefa(tarefa);
+            var novaTarefa = await _service.CriarTarefa(tarefa);
             return Ok(novaTarefa);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetPorId(int id)
+        public async Task<IActionResult> GetPorId(int id)
         {
-            var tarefa = _service.GetTarefaPorId(id);
+            var tarefa = await _service.GetTarefaPorId(id);
             if (tarefa == null)
                 return NotFound();
 
@@ -41,9 +41,9 @@ namespace TarefasApi.Controllers
         }
 
         [HttpPut("{id}/concluir")]
-        public IActionResult Concluir(int id)
+        public async Task<IActionResult> Concluir(int id)
         {
-            var tarefa = _service.ConcluirTarefa(id);
+            var tarefa = await _service.ConcluirTarefa(id);
             if (tarefa == null)
                 return NotFound();
 
@@ -51,9 +51,9 @@ namespace TarefasApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Excluir(int id)
+        public async Task<IActionResult> Excluir(int id)
         {
-            var sucesso = _service.ExcluirTarefa(id);
+            var sucesso = await _service.ExcluirTarefa(id);
             if (!sucesso)
                 return NotFound();
 
