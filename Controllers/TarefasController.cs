@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TarefasApi.Models;
+using TarefasApi.DTOs;
 using TarefasApi.Services;
 
 namespace TarefasApi.Controllers
@@ -35,9 +36,9 @@ namespace TarefasApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Criar(Tarefa tarefa)
+        public async Task<IActionResult> Criar([FromBody] TarefaRequestDTO tarefaDTO)
         {
-            var novaTarefa = await _service.CriarTarefa(tarefa);
+            var novaTarefa = await _service.CriarTarefa(tarefaDTO);
             return Ok(novaTarefa);
         }
 

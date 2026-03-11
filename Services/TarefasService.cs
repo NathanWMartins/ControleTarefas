@@ -1,5 +1,7 @@
 using TarefasApi.Data;
 using TarefasApi.Models;
+using TarefasApi.DTOs;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace TarefasApi.Services
@@ -7,13 +9,15 @@ namespace TarefasApi.Services
     public class TarefasService
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public TarefasService(AppDbContext context)
+        public TarefasService(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<(List<Tarefa> Tarefas, int TotalTarefas)> GetTarefas(int pagina = 1, int tamanhoPagina = 10)
+        public async Task<(List<TarefaResponseDTO> Tarefas, int TotalTarefas)> GetTarefas(int pagina = 1, int tamanhoPagina = 10)
         {
             var totalTarefas = await _context.Tarefas.CountAsync();
             var tarefas = await _context.Tarefas
@@ -22,22 +26,25 @@ namespace TarefasApi.Services
                 .Take(tamanhoPagina)
                 .ToListAsync();
 
-            return (tarefas, totalTarefas);
+            var tarefasDTO = _mapper.Map<List<TarefaResponseDTO>>(tarefas);
+            return (tarefasDTO, totalTarefas);
         }
 
-        public async Task<Tarefa> CriarTarefa(Tarefa tarefa)
+        public async Task<TarefaResponseDTO> CriarTarefa(TarefaRequestDTO tarefaDTO)
         {
+            var tarefa = _mapper.Map<Tarefa>(tarefaDTO);
             _context.Tarefas.Add(tarefa);
             await _context.SaveChangesAsync();
-            return tarefa;
+            return _mapper.Map<TarefaResponseDTO>(tarefa);
         }
 
-        public async Task<Tarefa?> GetTarefaPorId(int id)
+        public async Task<TarefaResponseDTO?> GetTarefaPorId(int id)
         {
-            return await _context.Tarefas.FirstOrDefaultAsync(t => t.Id == id);
+            var tarefa = await _context.Tarefas.FirstOrDefaultAsync(t => t.Id == id);
+            return tarefa == null ? null : _mapper.Map<TarefaResponseDTO>(tarefa);
         }
 
-        public async Task<Tarefa?> ConcluirTarefa(int id)
+        public async Task<TarefaResponseDTO?> ConcluirTarefa(int id)
         {
             var tarefa = await _context.Tarefas.FirstOrDefaultAsync(t => t.Id == id);
 
@@ -47,7 +54,7 @@ namespace TarefasApi.Services
                 await _context.SaveChangesAsync();
             }
 
-            return tarefa;
+            return tarefa == null ? null : _mapper.Map<TarefaResponseDTO>(tarefa);
         }
 
         public async Task<bool> ExcluirTarefa(int id)

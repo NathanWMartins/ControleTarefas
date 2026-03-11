@@ -1,9 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "KbnBN2C/xMw=",
+  "dgSpecHash": "2bIRYMcE6YM=",
   "success": true,
   "projectFilePath": "C:\\Users\\Cliente\\OneDrive\\Imagens\\Documentos\\study-.net\\ApiEstudo\\ApiEstudo.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Cliente\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
+    "C:\\Users\\Cliente\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
     "C:\\Users\\Cliente\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Cliente\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.4\\microsoft.aspnetcore.openapi.10.0.4.nupkg.sha512",
     "C:\\Users\\Cliente\\.nuget\\packages\\microsoft.build.framework\\18.0.2\\microsoft.build.framework.18.0.2.nupkg.sha512",
