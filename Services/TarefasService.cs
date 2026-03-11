@@ -17,6 +17,7 @@ namespace TarefasApi.Services
         {
             var totalTarefas = await _context.Tarefas.CountAsync();
             var tarefas = await _context.Tarefas
+                .OrderBy(t => t.Id)
                 .Skip((pagina - 1) * tamanhoPagina)
                 .Take(tamanhoPagina)
                 .ToListAsync();
