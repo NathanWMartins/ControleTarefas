@@ -2,6 +2,7 @@ using TarefasApi.Services;
 using Microsoft.EntityFrameworkCore;
 using TarefasApi.Data;
 using TarefasApi.Middlewares;
+using TarefasApi.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddScoped<ITarefaRepository, TarefaRepository>();
 builder.Services.AddScoped<TarefasService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=tarefas.db"));
