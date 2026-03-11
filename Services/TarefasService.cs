@@ -13,9 +13,15 @@ namespace TarefasApi.Services
             _context = context;
         }
 
-        public async Task<List<Tarefa>> GetTarefas()
+        public async Task<(List<Tarefa> Tarefas, int TotalTarefas)> GetTarefas(int pagina = 1, int tamanhoPagina = 10)
         {
-            return await _context.Tarefas.ToListAsync();
+            var totalTarefas = await _context.Tarefas.CountAsync();
+            var tarefas = await _context.Tarefas
+                .Skip((pagina - 1) * tamanhoPagina)
+                .Take(tamanhoPagina)
+                .ToListAsync();
+
+            return (tarefas, totalTarefas);
         }
 
         public async Task<Tarefa> CriarTarefa(Tarefa tarefa)

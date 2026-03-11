@@ -17,10 +17,21 @@ namespace TarefasApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromQuery] int pagina = 1, [FromQuery] int tamanhoPagina = 10)
         {
-            var tarefas = await _service.GetTarefas();
-            return Ok(tarefas);
+            if (pagina < 1) pagina = 1;
+            if (tamanhoPagina < 1) tamanhoPagina = 10;
+
+            var (tarefas, totalTarefas) = await _service.GetTarefas(pagina, tamanhoPagina);
+            
+            return Ok(new 
+            {
+                TotalTarefas = totalTarefas,
+                PaginaAtual = pagina,
+                TamanhoPagina = tamanhoPagina,
+                TotalPaginas = (int)Math.Ceiling((double)totalTarefas / tamanhoPagina),
+                Tarefas = tarefas
+            });
         }
 
         [HttpPost]
