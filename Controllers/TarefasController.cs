@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using TarefasApi.Models;
 using TarefasApi.DTOs;
 using TarefasApi.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TarefasApi.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class TarefasController : ControllerBase
     {
