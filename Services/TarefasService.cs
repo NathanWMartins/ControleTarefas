@@ -25,6 +25,15 @@ namespace TarefasApi.Services
             return (tarefasDTO, totalTarefas);
         }
 
+        public async Task<(List<TarefaResponseDTO> Tarefas, int TotalTarefas)> GetTarefasExcluidas(int pagina = 1, int tamanhoPagina = 10)
+        {
+            var totalTarefas = await _repository.GetTotalTarefasExcluidasAsync();
+            var tarefas = await _repository.GetTarefasExcluidasPaginadasAsync(pagina, tamanhoPagina);
+
+            var tarefasDTO = _mapper.Map<List<TarefaResponseDTO>>(tarefas);
+            return (tarefasDTO, totalTarefas);
+        }
+
         public async Task<TarefaResponseDTO> CriarTarefa(TarefaRequestDTO tarefaDTO)
         {
             var tarefa = _mapper.Map<Tarefa>(tarefaDTO);

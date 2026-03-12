@@ -35,6 +35,24 @@ namespace TarefasApi.Controllers
             });
         }
 
+        [HttpGet("excluidas")]
+        public async Task<IActionResult> GetExcluidas([FromQuery] int pagina = 1, [FromQuery] int tamanhoPagina = 10)
+        {
+            if (pagina < 1) pagina = 1;
+            if (tamanhoPagina < 1) tamanhoPagina = 10;
+
+            var (tarefas, totalTarefas) = await _service.GetTarefasExcluidas(pagina, tamanhoPagina);
+            
+            return Ok(new 
+            {
+                TotalTarefas = totalTarefas,
+                PaginaAtual = pagina,
+                TamanhoPagina = tamanhoPagina,
+                TotalPaginas = (int)Math.Ceiling((double)totalTarefas / tamanhoPagina),
+                Tarefas = tarefas
+            });
+        }
+
         [HttpPost]
         public async Task<IActionResult> Criar([FromBody] TarefaRequestDTO tarefaDTO)
         {

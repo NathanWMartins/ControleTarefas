@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using TarefasApi.Data;
 using TarefasApi.Middlewares;
 using TarefasApi.Repositories;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using TarefasApi.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<TarefaRequestDTOValidator>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<ITarefaRepository, TarefaRepository>();
 builder.Services.AddScoped<TarefasService>();
