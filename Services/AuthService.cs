@@ -19,22 +19,22 @@ namespace TarefasApi.Services
             _configuration = configuration;
         }
 
-        public async Task<LoginResponseDTO?> Login(LoginRequestDTO dto)
+        public async Task<Result<LoginResponseDTO>> Login(LoginRequestDTO dto)
         {
             var usuario = await _usuarioRepository.GetByEmailAsync(dto.Email);
 
             if (usuario == null || !BCrypt.Net.BCrypt.Verify(dto.Senha, usuario.SenhaHash))
-                return null;
+                return Result.Failure<LoginResponseDTO>("Email ou senha inválidos.");
 
-            return GerarToken(usuario);
+            return Result.Success(GerarToken(usuario), "Login realizado com sucesso.");
         }
 
-        public async Task<LoginResponseDTO?> Registrar(LoginRequestDTO dto)
+        public async Task<Result<LoginResponseDTO>> Registrar(LoginRequestDTO dto)
         {
             var usuarioExistente = await _usuarioRepository.GetByEmailAsync(dto.Email);
 
             if (usuarioExistente != null)
-                return null; // Email já cadastrado
+                return Result.Failure<LoginResponseDTO>("Este email já está cadastrado.");
 
             var usuario = new Usuario
             {
@@ -43,7 +43,7 @@ namespace TarefasApi.Services
             };
 
             await _usuarioRepository.AddAsync(usuario);
-            return GerarToken(usuario);
+            return Result.Success(GerarToken(usuario), "Usuário registrado com sucesso.");
         }
 
         private LoginResponseDTO GerarToken(Usuario usuario)

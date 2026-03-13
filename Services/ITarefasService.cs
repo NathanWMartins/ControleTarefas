@@ -1,14 +1,15 @@
 using TarefasApi.DTOs;
+using TarefasApi.Models;
 
 namespace TarefasApi.Services
 {
     public interface ITarefasService
     {
-        Task<(List<TarefaResponseDTO> Tarefas, int TotalTarefas)> GetTarefas(int pagina = 1, int tamanhoPagina = 10);
-        Task<(List<TarefaResponseDTO> Tarefas, int TotalTarefas)> GetTarefasExcluidas(int pagina = 1, int tamanhoPagina = 10);
-        Task<TarefaResponseDTO> CriarTarefa(TarefaRequestDTO tarefaDTO);
-        Task<TarefaResponseDTO?> GetTarefaPorId(int id);
-        Task<TarefaResponseDTO?> ConcluirTarefa(int id);
-        Task<bool> ExcluirTarefa(int id);
+        Task<Result<PagedResult<TarefaResponseDTO>>> GetTarefas(int pagina = 1, int tamanhoPagina = 10);
+        Task<Result<PagedResult<TarefaResponseDTO>>> GetTarefasExcluidas(int pagina = 1, int tamanhoPagina = 10);
+        Task<Result<TarefaResponseDTO>> CriarTarefa(TarefaRequestDTO tarefaDTO);
+        Task<Result<TarefaResponseDTO>> GetTarefaPorId(int id);
+        Task<Result<TarefaResponseDTO>> ConcluirTarefa(int id);
+        Task<Result> ExcluirTarefa(int id);
     }
 }

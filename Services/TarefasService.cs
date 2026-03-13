@@ -16,60 +16,68 @@ namespace TarefasApi.Services
             _mapper = mapper;
         }
 
-        public async Task<(List<TarefaResponseDTO> Tarefas, int TotalTarefas)> GetTarefas(int pagina = 1, int tamanhoPagina = 10)
+        public async Task<Result<PagedResult<TarefaResponseDTO>>> GetTarefas(int pagina = 1, int tamanhoPagina = 10)
         {
             var totalTarefas = await _repository.GetTotalTarefasAsync();
             var tarefas = await _repository.GetTarefasPaginadasAsync(pagina, tamanhoPagina);
 
             var tarefasDTO = _mapper.Map<List<TarefaResponseDTO>>(tarefas);
-            return (tarefasDTO, totalTarefas);
+            var pagedResult = new PagedResult<TarefaResponseDTO>(tarefasDTO, totalTarefas, pagina, tamanhoPagina);
+            
+            return Result.Success(pagedResult);
         }
 
-        public async Task<(List<TarefaResponseDTO> Tarefas, int TotalTarefas)> GetTarefasExcluidas(int pagina = 1, int tamanhoPagina = 10)
+        public async Task<Result<PagedResult<TarefaResponseDTO>>> GetTarefasExcluidas(int pagina = 1, int tamanhoPagina = 10)
         {
             var totalTarefas = await _repository.GetTotalTarefasExcluidasAsync();
             var tarefas = await _repository.GetTarefasExcluidasPaginadasAsync(pagina, tamanhoPagina);
 
             var tarefasDTO = _mapper.Map<List<TarefaResponseDTO>>(tarefas);
-            return (tarefasDTO, totalTarefas);
+            var pagedResult = new PagedResult<TarefaResponseDTO>(tarefasDTO, totalTarefas, pagina, tamanhoPagina);
+
+            return Result.Success(pagedResult);
         }
 
-        public async Task<TarefaResponseDTO> CriarTarefa(TarefaRequestDTO tarefaDTO)
+        public async Task<Result<TarefaResponseDTO>> CriarTarefa(TarefaRequestDTO tarefaDTO)
         {
             var tarefa = _mapper.Map<Tarefa>(tarefaDTO);
             await _repository.AddAsync(tarefa);
-            return _mapper.Map<TarefaResponseDTO>(tarefa);
+            var response = _mapper.Map<TarefaResponseDTO>(tarefa);
+            return Result.Success(response, "Tarefa criada com sucesso.");
         }
 
-        public async Task<TarefaResponseDTO?> GetTarefaPorId(int id)
+        public async Task<Result<TarefaResponseDTO>> GetTarefaPorId(int id)
         {
             var tarefa = await _repository.GetByIdAsync(id);
-            return tarefa == null ? null : _mapper.Map<TarefaResponseDTO>(tarefa);
+            if (tarefa == null)
+                return Result.Failure<TarefaResponseDTO>("Tarefa não encontrada.");
+
+            return Result.Success(_mapper.Map<TarefaResponseDTO>(tarefa));
         }
 
-        public async Task<TarefaResponseDTO?> ConcluirTarefa(int id)
-        {
-            var tarefa = await _repository.GetByIdAsync(id);
-
-            if (tarefa != null)
-            {
-                tarefa.Concluida = true;
-                await _repository.UpdateAsync(tarefa);
-            }
-
-            return tarefa == null ? null : _mapper.Map<TarefaResponseDTO>(tarefa);
-        }
-
-        public async Task<bool> ExcluirTarefa(int id)
+        public async Task<Result<TarefaResponseDTO>> ConcluirTarefa(int id)
         {
             var tarefa = await _repository.GetByIdAsync(id);
 
             if (tarefa == null)
-                return false;
+                return Result.Failure<TarefaResponseDTO>("Tarefa não encontrada.");
+
+            tarefa.Concluida = true;
+            await _repository.UpdateAsync(tarefa);
+            
+            return Result.Success(_mapper.Map<TarefaResponseDTO>(tarefa), "Tarefa concluída com sucesso.");
+        }
+
+        public async Task<Result> ExcluirTarefa(int id)
+        {
+            var tarefa = await _repository.GetByIdAsync(id);
+
+            if (tarefa == null)
+                return Result.Failure("Tarefa não encontrada.");
 
             await _repository.DeleteAsync(tarefa);
 
-            return true;
+            return Result.Success("Tarefa excluída com sucesso.");
         }
     }
-}
+}

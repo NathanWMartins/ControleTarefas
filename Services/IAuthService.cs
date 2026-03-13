@@ -1,10 +1,11 @@
 using TarefasApi.DTOs;
+using TarefasApi.Models;
 
 namespace TarefasApi.Services
 {
     public interface IAuthService
     {
-        Task<LoginResponseDTO?> Login(LoginRequestDTO dto);
-        Task<LoginResponseDTO?> Registrar(LoginRequestDTO dto);
+        Task<Result<LoginResponseDTO>> Login(LoginRequestDTO dto);
+        Task<Result<LoginResponseDTO>> Registrar(LoginRequestDTO dto);
     }
 }

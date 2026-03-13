@@ -4,9 +4,8 @@ using TarefasApi.Services;
 
 namespace TarefasApi.Controllers
 {
-    [ApiController]
     [Route("api/auth")]
-    public class AuthController : ControllerBase
+    public class AuthController : ApiControllerBase
     {
         private readonly IAuthService _authService;
 
@@ -15,28 +14,24 @@ namespace TarefasApi.Controllers
             _authService = authService;
         }
 
-        /// <summary>Registra um novo usuário na API.</summary>
         [HttpPost("registrar")]
         public async Task<IActionResult> Registrar([FromBody] LoginRequestDTO dto)
         {
-            var resultado = await _authService.Registrar(dto);
+            var result = await _authService.Registrar(dto);
+            if (!result.IsSuccess && result.Message == "Este email já está cadastrado.")
+                return Conflict(new { result.Message });
 
-            if (resultado == null)
-                return Conflict(new { mensagem = "Este email já está cadastrado." });
-
-            return Ok(resultado);
+            return HandleResult(result);
         }
 
-        /// <summary>Autentica um usuário e retorna um Token JWT.</summary>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO dto)
         {
-            var resultado = await _authService.Login(dto);
+            var result = await _authService.Login(dto);
+            if (!result.IsSuccess)
+                return Unauthorized(new { result.Message });
 
-            if (resultado == null)
-                return Unauthorized(new { mensagem = "Email ou senha inválidos." });
-
-            return Ok(resultado);
+            return HandleResult(result);
         }
     }
 }
