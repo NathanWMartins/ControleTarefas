@@ -12,9 +12,9 @@ namespace TarefasApi.Controllers
     public class TarefasController : ControllerBase
     {
 
-        private readonly TarefasService _service;
+        private readonly ITarefasService _service;
 
-        public TarefasController(TarefasService service)
+        public TarefasController(ITarefasService service)
         {
             _service = service;
         }

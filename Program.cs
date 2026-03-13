@@ -20,8 +20,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<TarefaRequestDTOValidator>(
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<ITarefaRepository, TarefaRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-builder.Services.AddScoped<TarefasService>();
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<ITarefasService, TarefasService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=tarefas.db"));
 

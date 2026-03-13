@@ -8,7 +8,7 @@ using TarefasApi.Repositories;
 
 namespace TarefasApi.Services
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IConfiguration _configuration;

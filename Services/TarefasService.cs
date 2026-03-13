@@ -5,7 +5,7 @@ using TarefasApi.Repositories;
 
 namespace TarefasApi.Services
 {
-    public class TarefasService
+    public class TarefasService : ITarefasService
     {
         private readonly ITarefaRepository _repository;
         private readonly IMapper _mapper;
