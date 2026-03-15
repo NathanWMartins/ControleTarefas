@@ -14,13 +14,13 @@ namespace TarefasApi.Controllers
             _authService = authService;
         }
 
+        /// <summary>
+        /// Registra um novo usuário no sistema.
+        /// </summary>
         [HttpPost("registrar")]
         public async Task<IActionResult> Registrar([FromBody] LoginRequestDTO dto)
         {
             var result = await _authService.Registrar(dto);
-            if (!result.IsSuccess && result.Message == "Este email já está cadastrado.")
-                return Conflict(new { result.Message });
-
             return HandleResult(result);
         }
 
@@ -28,9 +28,6 @@ namespace TarefasApi.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO dto)
         {
             var result = await _authService.Login(dto);
-            if (!result.IsSuccess)
-                return Unauthorized(new { result.Message });
-
             return HandleResult(result);
         }
     }

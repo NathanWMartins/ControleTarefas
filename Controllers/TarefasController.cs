@@ -15,6 +15,11 @@ namespace TarefasApi.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// Obtém a lista de tarefas do usuário logado, com suporte a paginação.
+        /// </summary>
+        /// <param name="pagina">Número da página.</param>
+        /// <param name="tamanhoPagina">Itens por página.</param>
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] int pagina = 1, [FromQuery] int tamanhoPagina = 10)
         {
@@ -35,6 +40,9 @@ namespace TarefasApi.Controllers
             return HandleResult(result);
         }
 
+        /// <summary>
+        /// Cria uma nova tarefa vinculada ao usuário logado.
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> Criar([FromBody] TarefaRequestDTO tarefaDTO)
         {
@@ -42,12 +50,13 @@ namespace TarefasApi.Controllers
             return HandleResult(result);
         }
 
+        /// <summary>
+        /// Obtém os detalhes de uma tarefa específica pelo ID.
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPorId(int id)
         {
             var result = await _service.GetTarefaPorId(id);
-            if (!result.IsSuccess) return NotFound(new { result.Message });
-
             return HandleResult(result);
         }
 
@@ -55,8 +64,6 @@ namespace TarefasApi.Controllers
         public async Task<IActionResult> Concluir(int id)
         {
             var result = await _service.ConcluirTarefa(id);
-            if (!result.IsSuccess) return NotFound(new { result.Message });
-
             return HandleResult(result);
         }
 
@@ -64,8 +71,6 @@ namespace TarefasApi.Controllers
         public async Task<IActionResult> Excluir(int id)
         {
             var result = await _service.ExcluirTarefa(id);
-            if (!result.IsSuccess) return NotFound(new { result.Message });
-
             return HandleResult(result);
         }
     }

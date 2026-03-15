@@ -14,7 +14,7 @@ namespace TarefasApi.Controllers
                 return result.Message != null ? Ok(result) : Ok();
             }
 
-            return result.Errors != null ? BadRequest(result) : BadRequest(new { result.Message });
+            return MapError(result);
         }
 
         protected IActionResult HandleResult<T>(Result<T> result)
@@ -24,7 +24,19 @@ namespace TarefasApi.Controllers
                 return Ok(result);
             }
 
-            return result.Errors != null ? BadRequest(result) : BadRequest(new { result.Message });
+            return MapError(result);
+        }
+
+        private IActionResult MapError(Result result)
+        {
+            return result.ErrorType switch
+            {
+                ErrorType.NotFound => NotFound(new { result.Message }),
+                ErrorType.Unauthorized => Unauthorized(new { result.Message }),
+                ErrorType.Conflict => Conflict(new { result.Message }),
+                ErrorType.ValidationError => BadRequest(result),
+                _ => BadRequest(new { result.Message })
+            };
         }
     }
 }

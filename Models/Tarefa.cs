@@ -7,5 +7,8 @@ namespace TarefasApi.Models
         public bool Concluida { get; set; } = false;
         public bool Excluida { get; set; } = false;
         public DateTime? DataExclusao { get; set; }
+
+        public int? UsuarioId { get; set; }
+        public Usuario? Usuario { get; set; }
     }
 }

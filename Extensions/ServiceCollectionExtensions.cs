@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using TarefasApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Reflection;
 using TarefasApi.Data;
 using TarefasApi.Repositories;
 using TarefasApi.Services;
@@ -20,6 +22,11 @@ namespace TarefasApi.Extensions
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite(configuration.GetConnectionString("DefaultConnection") ?? "Data Source=tarefas.db"));
 
+            // Configuration
+            services.AddOptions<JwtSettings>()
+                .BindConfiguration("Jwt")
+                .ValidateOnStart();
+
             // Repositories
             services.AddScoped<ITarefaRepository, TarefaRepository>();
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
@@ -27,6 +34,8 @@ namespace TarefasApi.Extensions
             // Services
             services.AddScoped<ITarefasService, TarefasService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddHttpContextAccessor();
+            services.AddScoped<IUserContext, UserContext>();
 
             // FluentValidation
             services.AddFluentValidationAutoValidation();
@@ -66,7 +75,17 @@ namespace TarefasApi.Extensions
         {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Tarefas API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo 
+                { 
+                    Title = "Tarefas API", 
+                    Version = "v1",
+                    Description = "API profissional para controle de tarefas com isolamento por usuário."
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = "Token JWT - Insira: Bearer {seu_token}",

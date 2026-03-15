@@ -50,7 +50,7 @@ namespace TarefasApi.Services
         {
             var tarefa = await _repository.GetByIdAsync(id);
             if (tarefa == null)
-                return Result.Failure<TarefaResponseDTO>("Tarefa não encontrada.");
+                return Result.Failure<TarefaResponseDTO>("Tarefa não encontrada.", ErrorType.NotFound);
 
             return Result.Success(_mapper.Map<TarefaResponseDTO>(tarefa));
         }
@@ -60,7 +60,7 @@ namespace TarefasApi.Services
             var tarefa = await _repository.GetByIdAsync(id);
 
             if (tarefa == null)
-                return Result.Failure<TarefaResponseDTO>("Tarefa não encontrada.");
+                return Result.Failure<TarefaResponseDTO>("Tarefa não encontrada.", ErrorType.NotFound);
 
             tarefa.Concluida = true;
             await _repository.UpdateAsync(tarefa);
@@ -73,7 +73,7 @@ namespace TarefasApi.Services
             var tarefa = await _repository.GetByIdAsync(id);
 
             if (tarefa == null)
-                return Result.Failure("Tarefa não encontrada.");
+                return Result.Failure("Tarefa não encontrada.", ErrorType.NotFound);
 
             await _repository.DeleteAsync(tarefa);
 

@@ -1,32 +1,40 @@
 using Microsoft.EntityFrameworkCore;
 using TarefasApi.Data;
 using TarefasApi.Models;
+using TarefasApi.Services;
 
 namespace TarefasApi.Repositories
 {
     public class TarefaRepository : ITarefaRepository
     {
         private readonly AppDbContext _context;
+        private readonly IUserContext _userContext;
 
-        public TarefaRepository(AppDbContext context)
+        public TarefaRepository(AppDbContext context, IUserContext userContext)
         {
             _context = context;
+            _userContext = userContext;
         }
+
+        private int GetUserIdOrThrow() => _userContext.GetUserId() ?? throw new UnauthorizedAccessException("Usuário não identificado.");
 
         public async Task<int> GetTotalTarefasAsync()
         {
-            return await _context.Tarefas.CountAsync(t => !t.Excluida);
+            var userId = GetUserIdOrThrow();
+            return await _context.Tarefas.CountAsync(t => !t.Excluida && t.UsuarioId == userId);
         }
 
         public async Task<int> GetTotalTarefasExcluidasAsync()
         {
-            return await _context.Tarefas.CountAsync(t => t.Excluida);
+            var userId = GetUserIdOrThrow();
+            return await _context.Tarefas.CountAsync(t => t.Excluida && t.UsuarioId == userId);
         }
 
         public async Task<List<Tarefa>> GetTarefasExcluidasPaginadasAsync(int pagina, int tamanhoPagina)
         {
+            var userId = GetUserIdOrThrow();
             return await _context.Tarefas
-                .Where(t => t.Excluida)
+                .Where(t => t.Excluida && t.UsuarioId == userId)
                 .OrderBy(t => t.Id)
                 .Skip((pagina - 1) * tamanhoPagina)
                 .Take(tamanhoPagina)
@@ -35,8 +43,9 @@ namespace TarefasApi.Repositories
 
         public async Task<List<Tarefa>> GetTarefasPaginadasAsync(int pagina, int tamanhoPagina)
         {
+            var userId = GetUserIdOrThrow();
             return await _context.Tarefas
-                .Where(t => !t.Excluida)
+                .Where(t => !t.Excluida && t.UsuarioId == userId)
                 .OrderBy(t => t.Id)
                 .Skip((pagina - 1) * tamanhoPagina)
                 .Take(tamanhoPagina)
@@ -45,11 +54,13 @@ namespace TarefasApi.Repositories
 
         public async Task<Tarefa?> GetByIdAsync(int id)
         {
-            return await _context.Tarefas.FirstOrDefaultAsync(t => t.Id == id && !t.Excluida);
+            var userId = GetUserIdOrThrow();
+            return await _context.Tarefas.FirstOrDefaultAsync(t => t.Id == id && !t.Excluida && t.UsuarioId == userId);
         }
 
         public async Task<Tarefa> AddAsync(Tarefa tarefa)
         {
+            tarefa.UsuarioId = GetUserIdOrThrow();
             _context.Tarefas.Add(tarefa);
             await _context.SaveChangesAsync();
             return tarefa;

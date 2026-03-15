@@ -5,18 +5,19 @@ using Microsoft.IdentityModel.Tokens;
 using TarefasApi.DTOs;
 using TarefasApi.Models;
 using TarefasApi.Repositories;
+using Microsoft.Extensions.Options;
 
 namespace TarefasApi.Services
 {
     public class AuthService : IAuthService
     {
         private readonly IUsuarioRepository _usuarioRepository;
-        private readonly IConfiguration _configuration;
+        private readonly JwtSettings _jwtSettings;
 
-        public AuthService(IUsuarioRepository usuarioRepository, IConfiguration configuration)
+        public AuthService(IUsuarioRepository usuarioRepository, IOptions<JwtSettings> jwtSettings)
         {
             _usuarioRepository = usuarioRepository;
-            _configuration = configuration;
+            _jwtSettings = jwtSettings.Value;
         }
 
         public async Task<Result<LoginResponseDTO>> Login(LoginRequestDTO dto)
@@ -24,7 +25,7 @@ namespace TarefasApi.Services
             var usuario = await _usuarioRepository.GetByEmailAsync(dto.Email);
 
             if (usuario == null || !BCrypt.Net.BCrypt.Verify(dto.Senha, usuario.SenhaHash))
-                return Result.Failure<LoginResponseDTO>("Email ou senha inválidos.");
+                return Result.Failure<LoginResponseDTO>("Email ou senha inválidos.", ErrorType.Unauthorized);
 
             return Result.Success(GerarToken(usuario), "Login realizado com sucesso.");
         }
@@ -34,7 +35,7 @@ namespace TarefasApi.Services
             var usuarioExistente = await _usuarioRepository.GetByEmailAsync(dto.Email);
 
             if (usuarioExistente != null)
-                return Result.Failure<LoginResponseDTO>("Este email já está cadastrado.");
+                return Result.Failure<LoginResponseDTO>("Este email já está cadastrado.", ErrorType.Conflict);
 
             var usuario = new Usuario
             {
@@ -48,10 +49,10 @@ namespace TarefasApi.Services
 
         private LoginResponseDTO GerarToken(Usuario usuario)
         {
-            var key = _configuration["Jwt:Key"]!;
-            var issuer = _configuration["Jwt:Issuer"]!;
-            var audience = _configuration["Jwt:Audience"]!;
-            var expiracaoHoras = int.Parse(_configuration["Jwt:ExpiracaoEmHoras"]!);
+            var key = _jwtSettings.Key;
+            var issuer = _jwtSettings.Issuer;
+            var audience = _jwtSettings.Audience;
+            var expiracaoHoras = _jwtSettings.ExpiracaoEmHoras;
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
